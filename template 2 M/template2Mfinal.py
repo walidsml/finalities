@@ -135,7 +135,7 @@ def generate_sage_erp_csv(delivery_details_path, order_details_path, products_de
     ORDDAT = datetime.today().strftime('%Y%m%d')
 
     sage_erp_lines = []
-    sage_erp_lines.append(f"E;AL1;SON;;{BPCORD};{ORDDAT};;{CUSORDREF};AL1;;;;;;")
+    sage_erp_lines.append(f"E;AL1;SON;;{BPCORD};{ORDDAT};;{CUSORDREF};AL1;;ADR;;;;")
 
     for _, row in products_df.iterrows():
         ITMREF = row['Article']

@@ -74,7 +74,7 @@ def split_store_city(text):
     store = parts[0]
     city = parts[1] if len(parts) > 1 else ''
     return store, city
-
+                        
 # Path to your PDF file
 pdf_path = "templatefull2.pdf"
 
@@ -90,6 +90,7 @@ try:
 
         # Extracting raw text from the PDF for order details
         order_text = tables[1].to_string(index=False)
+        print("Order text extracted from PDF:\n", order_text)  # Debug print
 
         # Initialize the order dictionary
         order_dict = {
@@ -100,25 +101,25 @@ try:
             "ORDDAT": datetime.today().strftime('%Y%m%d'),
             "CUSORDREF": "",
             "STOFCY": "AL1",  # Set STOFCY same as SALFCY
-            "CUR": "",
-            "PJT": "",
-            "*71": "",
-            "*72": "",
-            "*81": "",
-            "*82": ""
+            "EXPDATE": "",
+            "ADR": "ADR",
         }
 
-        # Define patterns for extracting Site and Commande from order text
+        # Define patterns for extracting Site, Commande, and Date livraison prevue from order text
         patterns = {
             "Site": r'Site\s*:\s*([^\n]+)',
-            "Commande": r'Commande\s*:\s*([\d]+)'
+            "Commande": r'Commande\s*:\s*([\d]+)',
+            "Date Livraison Prevue": r'Date Livraison Prevue\s*:\s*([\d/]+)'
         }
 
-        # Extract Site and Commande using regex
+        # Extract Site, Commande, and Date livraison prevue using regex
         for key, pattern in patterns.items():
             match = re.search(pattern, order_text)
             if match:
                 order_dict[key] = match.group(1).strip()
+                print(f"{key} extracted: {order_dict[key]}")  # Debug print
+            else:
+                print(f"{key} not found")  # Debug print
 
         # Remove specific words from site name if present
         words_to_remove = ["market", "medina"]
@@ -132,6 +133,13 @@ try:
         # Set CUSORDREF from Commande
         order_dict["CUSORDREF"] = order_dict["Commande"]
 
+        # Format the Date Livraison Prevue to the desired format if it was found
+        if "Date Livraison Prevue" in order_dict:
+            delivery_date = datetime.strptime(order_dict["Date Livraison Prevue"], '%d/%m/%Y').strftime('%Y%m%d')
+            order_dict["EXPDATE"] = delivery_date
+        else:
+            order_dict["EXPDATE"] = "error date livraison prevue"  # Handle missing date
+
         # Prepare header and lines for Sage ERP CSV
         header = [
             'E',
@@ -142,12 +150,8 @@ try:
             order_dict['ORDDAT'],
             order_dict['CUSORDREF'],
             order_dict['STOFCY'],
-            order_dict['CUR'],
-            order_dict['PJT'],
-            order_dict['*71'],
-            order_dict['*72'],
-            order_dict['*81'],
-            order_dict['*82']
+            order_dict['EXPDATE'],
+            order_dict['ADR'],
         ]
 
         lines = []
