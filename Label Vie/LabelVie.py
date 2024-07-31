@@ -7,7 +7,7 @@ import re
 from datetime import datetime
 
 # Specify the PDF file path
-pdf_file = 'templatefull3.pdf'  # Adjust this path if needed
+pdf_file = 'LabelVie.pdf'  # Adjust this path if needed
 output_dir = '/Users/walid/Desktop/result/temp22/'  # Directory to save the CSV files
 
 # Create output directory if it does not exist

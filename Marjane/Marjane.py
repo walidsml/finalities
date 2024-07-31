@@ -76,7 +76,7 @@ def split_store_city(text):
     return store, city
                         
 # Path to your PDF file
-pdf_path = "templatefull2.pdf"
+pdf_path = "marjaneFull.pdf"
 
 try:
     # Extract tables from the PDF
